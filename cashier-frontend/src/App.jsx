@@ -63,15 +63,15 @@ function App() {
   };
 
   return (
-    <div>
-      {/* Фирменный хедер */}
+    <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
+      {/* Хэдер с вашим фоном и названием команды */}
       <div className="forte-navbar">
         <div className="forte-logo-area">
           <div className="forte-logo">forte</div>
-          <span className="forte-nav-title">| Datathon 2026 • Кассовая дисциплина</span>
+          <span style={{ fontWeight: '600', color: '#374151', fontSize: '15px' }}>| Datathon 2026</span>
         </div>
-        <div style={{ fontSize: '14px', fontWeight: '500', color: '#4b5563' }}>
-          Аналитический модуль НБРК
+        <div className="team-badge">
+          🔥 Team: Hot Asian Chisks
         </div>
       </div>
 
@@ -81,9 +81,6 @@ function App() {
           <div>
             <h1>Контроль кассовых операций</h1>
             <p>Автоматизированная проверка видеопотоков на соответствие стандартам и законам РК</p>
-          </div>
-          <div style={{ background: 'rgba(255,255,255,0.15)', padding: '10px 16px', borderRadius: '12px', fontSize: '13px', fontWeight: '600' }}>
-            SECURE AI SYSTEM
           </div>
         </div>
 
@@ -173,6 +170,16 @@ function App() {
           )}
         </div>
       </div>
+
+      {/* Футер с именами и командой */}
+      <footer className="forte-footer">
+        <div className="footer-content">
+          <div><b>ForteBank Datathon 2026</b> • Командный проект</div>
+          <div className="team-members">
+            Разработано командой <b>Hot Asian Chisks</b>: Kamila A. | Begina M. | Ayganym B. | Assel T.
+          </div>
+        </div>
+      </footer>
     </div>
   );
 }
