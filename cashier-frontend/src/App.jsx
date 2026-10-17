@@ -1,123 +1,98 @@
 import React, { useState } from 'react';
 import './App.css';
+import { REGULATIONS } from './constants/regulations';
 
 function App() {
   const [file, setFile] = useState(null);
-  const [status, setStatus] = useState('idle'); // idle, uploading, processing, done, failed
+  const [status, setStatus] = useState('idle'); // idle, processing, done
   const [result, setResult] = useState(null);
 
-  // Обработка выбора файла
   const handleFileChange = (e) => {
     if (e.target.files && e.target.files[0]) {
       setFile(e.target.files[0]);
     }
   };
 
-  // Отправка видео на бэкенд (или заглушка для теста)
   const handleAnalyze = async () => {
     if (!file) return;
-
     setStatus('processing');
 
-    // ТУТ БУДЕТ ВАШ API-ЗАПРОС К PYTHON (FastAPI):
-    // const formData = new FormData();
-    // formData.append('file', file);
-    // const res = await fetch('https://your-backend.kz/api/v1/analyze', {
-    //   method: 'POST',
-    //   headers: { 'X-API-Key': 'ваш_ключ' },
-    //   body: formData
-    // });
-    // const data = await res.json();
-    // const jobId = data.job_id;
-    // ... опрос статуса GET /api/v1/jobs/{job_id} ...
-
-    // ДЛЯ ТЕСТА (мокаем ответ через 3 секунды):
+    // Симуляция ответа бэкенда с привязкой к нашему ID нарушения (например, V04 - Оставленная активная кассовая программа)
     setTimeout(() => {
       setStatus('done');
+      const violationKey = "V04"; 
+      const regInfo = REGULATIONS[violationKey];
+
       setResult({
-        job_id: "forte_demo_01",
-        verdict: "violation", // или "no_violation"
+        job_id: "forte_datathon_2026",
+        verdict: "violation",
         violations: [
           {
-            type: "Оставление рабочего места кассиром",
-            timecode_sec: 22.0,
-            description: "На видео зафиксировано, как кассир покидает рабочее место до завершения расчетной операции, оставляя зону без контроля.",
-            evidence_frames: [
-              { timestamp_sec: 22.0, image_base64: "https://via.placeholder.com/300x169.png?text=Evidence+Frame+22s" }
-            ],
+            type: regInfo.category,
+            violation_id: violationKey,
+            timecode_sec: "00:18",
+            description: "На видео зафиксировано, как кассир оставил рабочее место с активной кассовой системой без блокировки.",
             regulatory_reference: {
-              document: "Правила ведения кассовых операций в банках Республики Казахстан (adilet.zan.kz)",
-              clause: "Пункт 22"
-            }
+              document: regInfo.document,
+              clause: regInfo.clause,
+              details: regInfo.description
+            },
+            evidence_frame: "https://via.placeholder.com/300x169.png?text=Evidence+00:18"
           }
         ]
       });
-    }, 3000);
+    }, 2500);
   };
 
   return (
-    <div style={{ padding: '30px', maxWidth: '800px', margin: '0 auto', fontFamily: 'sans-serif' }}>
+    <div style={{ padding: '30px', maxWidth: '850px', margin: '0 auto', fontFamily: 'sans-serif', color: '#333' }}>
       <h2>ForteBank Datathon 26 — Контроль кассовой дисциплины</h2>
-      <p>Загрузите видеозапись (.mov) для проверки на видимые признаки нарушений.</p>
+      <p>Локальный AI-сервис проверки видеозаписей на соответствие нормативам РК.</p>
 
       {/* Зона загрузки */}
-      <div style={{ border: '2px dashed #ccc', padding: '20px', textAlign: 'center', marginBottom: '20px', borderRadius: '8px' }}>
-        <input type="file" accept=".mov,video/quicktime" onChange={handleFileChange} />
-        {file && <p>Выбран файл: <b>{file.name}</b> ({(file.size / (1024*1024)).toFixed(2)} MB)</p>}
+      <div style={{ border: '2px dashed #007bff', padding: '25px', textAlign: 'center', marginBottom: '20px', borderRadius: '8px', background: '#f8f9fa' }}>
+        <input type="file" accept=".mov,video/quicktime,video/mp4" onChange={handleFileChange} />
+        {file && <p style={{ marginTop: '10px' }}>Выбран файл: <b>{file.name}</b></p>}
       </div>
 
       <button 
         onClick={handleAnalyze} 
         disabled={!file || status === 'processing'}
-        style={{ padding: '10px 20px', fontSize: '16px', background: '#007bff', color: '#fff', border: 'none', borderRadius: '4px', cursor: 'pointer' }}
+        style={{ padding: '12px 24px', fontSize: '16px', background: '#007bff', color: '#fff', border: 'none', borderRadius: '4px', cursor: 'pointer' }}
       >
-        {status === 'processing' ? 'Анализ видео (может занять до 5 минут)...' : 'Запустить анализ'}
+        {status === 'processing' ? 'Анализ кадров и сверка с НБРК...' : 'Запустить анализ'}
       </button>
 
-      {/* Статус обработки */}
       {status === 'processing' && (
-        <div style={{ marginTop: '20px', color: '#ff8c00' }}>
-          ⏳ Идет обработка видеокадров и сверка с нормативной базой РК...
+        <div style={{ marginTop: '20px', color: '#d9534f', fontWeight: 'bold' }}>
+          ⏳ Выполняется покадровый анализ и поиск правовых оснований...
         </div>
       )}
 
-      {/* Результаты */}
       {status === 'done' && result && (
-        <div style={{ marginTop: '30px', borderTop: '1px solid #ddd', paddingTop: '20px' }}>
+        <div style={{ marginTop: '30px', borderTop: '2px solid #eee', paddingTop: '20px' }}>
           <h3>Результат проверки:</h3>
-          <div style={{ 
-            padding: '15px', 
-            borderRadius: '6px', 
-            background: result.verdict === 'violation' ? '#ffe6e6' : '#e6ffe6',
-            color: result.verdict === 'violation' ? '#d9534f' : '#28a745',
-            fontWeight: 'bold',
-            fontSize: '18px',
-            marginBottom: '20px'
-          }}>
-            {result.verdict === 'violation' ? '⚠️ Обнаружены признаки возможных нарушений' : '✅ Нарушение не обнаружено'}
+          <div style={{ padding: '15px', borderRadius: '6px', background: '#ffe6e6', color: '#d9534f', fontWeight: 'bold', marginBottom: '20px' }}>
+            ⚠️ Обнаружены нарушения кассовой дисциплины
           </div>
 
-          {result.violations && result.violations.map((item, index) => (
-            <div key={index} style={{ background: '#f9f9f9', padding: '15px', borderRadius: '6px', marginBottom: '15px', border: '1px solid #eee' }}>
-              <h4 style={{ margin: '0 0 10px 0', color: '#333' }}>{item.type}</h4>
-              <p><b>Таймкод:</b> <span style={{ color: '#007bff', cursor: 'pointer' }}>{item.timecode_sec} сек</span></p>
-              <p><b>Описание:</b> {item.description}</p>
+          {result.violations.map((item, index) => (
+            <div key={index} style={{ background: '#fff', padding: '20px', borderRadius: '8px', marginBottom: '15px', border: '1px solid #ddd', boxShadow: '0 2px 4px rgba(0,0,0,0.05)' }}>
+              <h4 style={{ margin: '0 0 10px 0', color: '#007bff' }}>[{item.violation_id}] {item.type}</h4>
+              <p><b>Таймкод:</b> {item.timecode_sec}</p>
+              <p><b>Описание ситуации:</b> {item.description}</p>
               
-              <div style={{ background: '#fff', padding: '10px', border: '1px solid #ddd', borderRadius: '4px', marginBottom: '10px' }}>
-                <p style={{ margin: '0 0 5px 0', fontSize: '14px', color: '#666' }}><b>Нормативный источник РК:</b></p>
-                <p style={{ margin: 0, fontSize: '14px' }}>📜 {item.regulatory_reference.document} ({item.regulatory_reference.clause})</p>
+              {/* Блок юридического обоснования РК */}
+              <div style={{ background: '#e9ecef', padding: '12px', borderRadius: '6px', margin: '15px 0', borderLeft: '4px solid #007bff' }}>
+                <p style={{ margin: '0 0 5px 0', fontSize: '14px' }}><b>📜 Нормативная база РК (adilet.zan.kz):</b></p>
+                <p style={{ margin: '0 0 5px 0', fontSize: '14px', color: '#004085' }}><b>{item.regulatory_reference.document}</b></p>
+                <p style={{ margin: '0 0 5px 0', fontSize: '14px' }}><i>{item.regulatory_reference.clause}</i></p>
+                <p style={{ margin: 0, fontSize: '13px', color: '#555' }}>{item.regulatory_reference.details}</p>
               </div>
 
               <div>
-                <p style={{ fontSize: '14px', color: '#666' }}><b>Кадр-доказательство:</b></p>
-                {item.evidence_frames.map((frame, fIdx) => (
-                  <img 
-                    key={fIdx} 
-                    src={frame.image_base64} 
-                    alt="Evidence" 
-                    style={{ maxWidth: '100%', borderRadius: '4px', border: '1px solid #ccc' }} 
-                  />
-                ))}
+                <p style={{ fontSize: '14px', color: '#666' }}><b>Кадр-доказательство нарушения:</b></p>
+                <img src={item.evidence_frame} alt="Evidence" style={{ maxWidth: '100%', borderRadius: '4px', border: '1px solid #ccc' }} />
               </div>
             </div>
           ))}
