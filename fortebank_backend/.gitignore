@@ -1,0 +1,38 @@
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+.pytest_cache/
+
+# Secret keys
+.env
+.env.*
+*.pem
+*.key
+
+# Database
+*.db
+*.sqlite
+*.sqlite3
+
+# Uploaded videos
+uploads/
+*.mov
+*.mp4
+*.avi
+
+# Generated evidence
+evidence/
+frames/
+output/
+
+# Editor and system
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Local logs
+*.log
