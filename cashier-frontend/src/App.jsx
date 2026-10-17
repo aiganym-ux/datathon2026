@@ -4,8 +4,9 @@ import { REGULATIONS } from './constants/regulations';
 
 function App() {
   const [file, setFile] = useState(null);
-  const [status, setStatus] = useState('idle'); // idle, processing, done
+  const [status, setStatus] = useState('idle');
   const [result, setResult] = useState(null);
+  const [useBackend, setUseBackend] = useState(false);
 
   const handleFileChange = (e) => {
     if (e.target.files && e.target.files[0]) {
@@ -17,87 +18,161 @@ function App() {
     if (!file) return;
     setStatus('processing');
 
-    // Симуляция ответа бэкенда с привязкой к нашему ID нарушения (например, V04 - Оставленная активная кассовая программа)
-    setTimeout(() => {
-      setStatus('done');
-      const violationKey = "V04"; 
-      const regInfo = REGULATIONS[violationKey];
+    if (useBackend) {
+      try {
+        const formData = new FormData();
+        formData.append('file', file);
+        const response = await fetch('http://localhost:8000/api/v1/analyze', {
+          method: 'POST',
+          body: formData,
+        });
+        if (!response.ok) throw new Error('Ошибка сервера');
+        const data = await response.json();
+        setResult(data);
+        setStatus('done');
+      } catch (err) {
+        console.error(err);
+        setStatus('error');
+      }
+    } else {
+      setTimeout(() => {
+        setStatus('done');
+        const violationKey = "V04"; 
+        const regInfo = REGULATIONS[violationKey];
 
-      setResult({
-        job_id: "forte_datathon_2026",
-        verdict: "violation",
-        violations: [
-          {
-            type: regInfo.category,
-            violation_id: violationKey,
-            timecode_sec: "00:18",
-            description: "На видео зафиксировано, как кассир оставил рабочее место с активной кассовой системой без блокировки.",
-            regulatory_reference: {
-              document: regInfo.document,
-              clause: regInfo.clause,
-              details: regInfo.description
-            },
-            evidence_frame: "https://via.placeholder.com/300x169.png?text=Evidence+00:18"
-          }
-        ]
-      });
-    }, 2500);
+        setResult({
+          job_id: "forte_datathon_2026_demo",
+          verdict: "violation",
+          violations: [
+            {
+              type: regInfo.category,
+              violation_id: violationKey,
+              timecode_sec: "00:18",
+              description: "На видео зафиксировано, как кассир оставил рабочее место с активной кассовой системой без блокировки.",
+              regulatory_reference: {
+                document: regInfo.document,
+                clause: regInfo.clause,
+                details: regInfo.description
+              },
+              evidence_frame: "https://images.unsplash.com/photo-1556742049-0a67d5e2c56f?auto=format&fit=crop&w=800&q=80"
+            }
+          ]
+        });
+      }, 2000);
+    }
   };
 
   return (
-    <div style={{ padding: '30px', maxWidth: '850px', margin: '0 auto', fontFamily: 'sans-serif', color: '#333' }}>
-      <h2>ForteBank Datathon 26 — Контроль кассовой дисциплины</h2>
-      <p>Локальный AI-сервис проверки видеозаписей на соответствие нормативам РК.</p>
-
-      {/* Зона загрузки */}
-      <div style={{ border: '2px dashed #007bff', padding: '25px', textAlign: 'center', marginBottom: '20px', borderRadius: '8px', background: '#f8f9fa' }}>
-        <input type="file" accept=".mov,video/quicktime,video/mp4" onChange={handleFileChange} />
-        {file && <p style={{ marginTop: '10px' }}>Выбран файл: <b>{file.name}</b></p>}
+    <div>
+      {/* Фирменный хедер */}
+      <div className="forte-navbar">
+        <div className="forte-logo-area">
+          <div className="forte-logo">forte</div>
+          <span className="forte-nav-title">| Datathon 2026 • Кассовая дисциплина</span>
+        </div>
+        <div style={{ fontSize: '14px', fontWeight: '500', color: '#4b5563' }}>
+          Аналитический модуль НБРК
+        </div>
       </div>
 
-      <button 
-        onClick={handleAnalyze} 
-        disabled={!file || status === 'processing'}
-        style={{ padding: '12px 24px', fontSize: '16px', background: '#007bff', color: '#fff', border: 'none', borderRadius: '4px', cursor: 'pointer' }}
-      >
-        {status === 'processing' ? 'Анализ кадров и сверка с НБРК...' : 'Запустить анализ'}
-      </button>
-
-      {status === 'processing' && (
-        <div style={{ marginTop: '20px', color: '#d9534f', fontWeight: 'bold' }}>
-          ⏳ Выполняется покадровый анализ и поиск правовых оснований...
+      <div className="app-container">
+        {/* Герой-баннер */}
+        <div className="hero-banner">
+          <div>
+            <h1>Контроль кассовых операций</h1>
+            <p>Автоматизированная проверка видеопотоков на соответствие стандартам и законам РК</p>
+          </div>
+          <div style={{ background: 'rgba(255,255,255,0.15)', padding: '10px 16px', borderRadius: '12px', fontSize: '13px', fontWeight: '600' }}>
+            SECURE AI SYSTEM
+          </div>
         </div>
-      )}
 
-      {status === 'done' && result && (
-        <div style={{ marginTop: '30px', borderTop: '2px solid #eee', paddingTop: '20px' }}>
-          <h3>Результат проверки:</h3>
-          <div style={{ padding: '15px', borderRadius: '6px', background: '#ffe6e6', color: '#d9534f', fontWeight: 'bold', marginBottom: '20px' }}>
-            ⚠️ Обнаружены нарушения кассовой дисциплины
+        {/* Основная рабочая панель */}
+        <div className="main-card">
+          <div style={{ marginBottom: '20px', fontSize: '14px', color: '#4b5563' }}>
+            <label style={{ cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: '8px' }}>
+              <input 
+                type="checkbox" 
+                checked={useBackend} 
+                onChange={(e) => setUseBackend(e.target.checked)} 
+              />
+              <b>Подключить реальный FastAPI бэкенд</b> (порт 8000)
+            </label>
           </div>
 
-          {result.violations.map((item, index) => (
-            <div key={index} style={{ background: '#fff', padding: '20px', borderRadius: '8px', marginBottom: '15px', border: '1px solid #ddd', boxShadow: '0 2px 4px rgba(0,0,0,0.05)' }}>
-              <h4 style={{ margin: '0 0 10px 0', color: '#007bff' }}>[{item.violation_id}] {item.type}</h4>
-              <p><b>Таймкод:</b> {item.timecode_sec}</p>
-              <p><b>Описание ситуации:</b> {item.description}</p>
-              
-              {/* Блок юридического обоснования РК */}
-              <div style={{ background: '#e9ecef', padding: '12px', borderRadius: '6px', margin: '15px 0', borderLeft: '4px solid #007bff' }}>
-                <p style={{ margin: '0 0 5px 0', fontSize: '14px' }}><b>📜 Нормативная база РК (adilet.zan.kz):</b></p>
-                <p style={{ margin: '0 0 5px 0', fontSize: '14px', color: '#004085' }}><b>{item.regulatory_reference.document}</b></p>
-                <p style={{ margin: '0 0 5px 0', fontSize: '14px' }}><i>{item.regulatory_reference.clause}</i></p>
-                <p style={{ margin: 0, fontSize: '13px', color: '#555' }}>{item.regulatory_reference.details}</p>
-              </div>
+          <div className="upload-zone" onClick={() => document.getElementById('fileInput').click()}>
+            <input 
+              id="fileInput"
+              type="file" 
+              accept=".mov,video/quicktime,video/mp4" 
+              onChange={handleFileChange} 
+              style={{ display: 'none' }}
+            />
+            <p style={{ margin: '0 0 8px 0', fontSize: '16px', fontWeight: '600', color: '#1f2937' }}>
+              {file ? `📁 Выбран файл: ${file.name}` : '📥 Перетащите видеозапись (.mov / .mp4) сюда'}
+            </p>
+            <span style={{ color: '#6b7280', fontSize: '13px' }}>Поддерживается проверка датасета инвентаря касс</span>
+          </div>
 
-              <div>
-                <p style={{ fontSize: '14px', color: '#666' }}><b>Кадр-доказательство нарушения:</b></p>
-                <img src={item.evidence_frame} alt="Evidence" style={{ maxWidth: '100%', borderRadius: '4px', border: '1px solid #ccc' }} />
-              </div>
+          <button 
+            className="btn-forte"
+            onClick={handleAnalyze} 
+            disabled={!file || status === 'processing'}
+          >
+            {status === 'processing' ? '⏳ Выполняется покадровый анализ...' : 'Запустить проверку соблюдения правил'}
+          </button>
+
+          {status === 'error' && (
+            <div style={{ marginTop: '20px', padding: '15px', background: '#fee2e2', color: '#991b1b', borderRadius: '8px' }}>
+              ❌ Ошибка подключения к бэкенду. Проверьте запуск сервера FastAPI.
             </div>
-          ))}
+          )}
+
+          {status === 'done' && result && (
+            <div style={{ marginTop: '30px', borderTop: '1px solid var(--border-color)', paddingTop: '25px' }}>
+              <h3 style={{ margin: '0 0 20px 0', fontSize: '20px' }}>Экспертное заключение:</h3>
+              
+              {result.verdict === 'no_violation' ? (
+                <div className="success-alert">
+                  ✅ Нарушений кассовой дисциплины не зафиксировано.
+                </div>
+              ) : (
+                <>
+                  <div className="violation-alert">
+                    ⚠️ Внимание: Зафиксировано отклонение от регламента кассовых операций
+                  </div>
+
+                  {result.violations && result.violations.map((item, index) => (
+                    <div key={index} className="result-card">
+                      <h4 style={{ margin: '0 0 10px 0', color: 'var(--forte-burgundy)', fontSize: '18px' }}>
+                        {item.violation_id ? `[${item.violation_id}] ` : ''}{item.type}
+                      </h4>
+                      <p style={{ margin: '6px 0' }}><b>Таймкод на видео:</b> <span style={{ color: 'var(--forte-burgundy)', fontWeight: '600' }}>{item.timecode_sec} сек</span></p>
+                      <p style={{ margin: '6px 0 15px 0' }}><b>Описание события:</b> {item.description}</p>
+                      
+                      {item.regulatory_reference && (
+                        <div className="reg-box">
+                          <p style={{ margin: '0 0 5px 0', fontSize: '12px', color: '#6b7280', textTransform: 'uppercase', letterSpacing: '0.5px' }}><b>Правовое обоснование РК (adilet.zan.kz):</b></p>
+                          <p style={{ margin: '0 0 5px 0', fontSize: '14px', color: '#1f2937' }}><b>{item.regulatory_reference.document}</b></p>
+                          <p style={{ margin: '0 0 5px 0', fontSize: '14px', color: 'var(--forte-burgundy)' }}><i>{item.regulatory_reference.clause}</i></p>
+                          <p style={{ margin: 0, fontSize: '13px', color: '#4b5563' }}>{item.regulatory_reference.details || item.regulatory_reference.description}</p>
+                        </div>
+                      )}
+
+                      {item.evidence_frame && (
+                        <div style={{ marginTop: '15px' }}>
+                          <p style={{ fontSize: '13px', color: '#6b7280', marginBottom: '6px' }}><b>Кадр-фиксация нарушения:</b></p>
+                          <img src={item.evidence_frame} alt="Evidence" className="evidence-img" />
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </>
+              )}
+            </div>
+          )}
         </div>
-      )}
+      </div>
     </div>
   );
 }
