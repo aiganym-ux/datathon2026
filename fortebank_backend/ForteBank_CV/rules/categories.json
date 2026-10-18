@@ -1,0 +1,122 @@
+[
+  {
+    "id": "V01",
+    "name": "Неполная выдача денег",
+    "regulation_status": "not_verified",
+    "source_url": null,
+    "document": null,
+    "clause": null
+  },
+  {
+    "id": "V02",
+    "name": "Проверка документов/данных клиента",
+    "regulation_status": "not_verified",
+    "source_url": null,
+    "document": null,
+    "clause": null
+  },
+  {
+    "id": "V03",
+    "name": "Хранение наличных в сейфе",
+    "regulation_status": "not_verified",
+    "source_url": null,
+    "document": null,
+    "clause": null
+  },
+  {
+    "id": "V04",
+    "name": "Оставленная активная кассовая программа",
+    "regulation_status": "not_verified",
+    "source_url": null,
+    "document": null,
+    "clause": null
+  },
+  {
+    "id": "V05",
+    "name": "Пересчёт/проверка наличных",
+    "regulation_status": "not_verified",
+    "source_url": null,
+    "document": null,
+    "clause": null
+  },
+  {
+    "id": "V06",
+    "name": "Наличные без присмотра",
+    "regulation_status": "not_verified",
+    "source_url": null,
+    "document": null,
+    "clause": null
+  },
+  {
+    "id": "V07",
+    "name": "Одновременное обслуживание клиентов",
+    "regulation_status": "not_verified",
+    "source_url": null,
+    "document": null,
+    "clause": null
+  },
+  {
+    "id": "V08",
+    "name": "Незакрытый сейф",
+    "regulation_status": "not_verified",
+    "source_url": null,
+    "document": null,
+    "clause": null
+  },
+  {
+    "id": "V09",
+    "name": "Ключ в замке сейфа",
+    "regulation_status": "not_verified",
+    "source_url": null,
+    "document": null,
+    "clause": null
+  },
+  {
+    "id": "V10",
+    "name": "Документы без присмотра",
+    "regulation_status": "not_verified",
+    "source_url": null,
+    "document": null,
+    "clause": null
+  },
+  {
+    "id": "V11",
+    "name": "Доступ клиента во время настройки",
+    "regulation_status": "not_verified",
+    "source_url": null,
+    "document": null,
+    "clause": null
+  },
+  {
+    "id": "V12",
+    "name": "Открытая дверь кассового помещения",
+    "regulation_status": "not_verified",
+    "source_url": null,
+    "document": null,
+    "clause": null
+  },
+  {
+    "id": "V13",
+    "name": "Незавершённый расчёт с клиентом",
+    "regulation_status": "not_verified",
+    "source_url": null,
+    "document": null,
+    "clause": null
+  },
+  {
+    "id": "V14",
+    "name": "Личные вещи на рабочем столе",
+    "regulation_status": "not_verified",
+    "source_url": null,
+    "document": null,
+    "clause": null
+  },
+  {
+    "id": "V15",
+    "name": "Приём пищи на рабочем месте",
+    "regulation_status": "not_verified",
+    "source_url": null,
+    "document": null,
+    "clause": null
+  }
+]

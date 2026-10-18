@@ -10,3 +10,5 @@ uploads/
 *.db
 *.sqlite
 *.sqlite3
+test_videos/
+runtime_evidence/

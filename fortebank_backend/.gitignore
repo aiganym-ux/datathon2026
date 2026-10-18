@@ -36,3 +36,6 @@ Thumbs.db
 
 # Local logs
 *.log
+
+test_videos/
+runtime_evidence/
