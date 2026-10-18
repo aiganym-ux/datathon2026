@@ -1,7 +1,7 @@
 import base64
 from pathlib import Path
 import cv2
-from video_processor import get_video_info
+from ForteBank_CV.video_processor import get_video_info
 
 def evidence_at(video_path, time_sec, output_dir='evidence'):
     info = get_video_info(video_path)
